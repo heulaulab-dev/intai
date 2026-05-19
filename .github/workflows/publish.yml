@@ -20,6 +20,7 @@ jobs:
         with:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
+          node-registry-auth: true
 
       - name: Install dependencies
         run: npm ci
@@ -28,6 +29,10 @@ jobs:
         run: npm run build
 
       - name: Publish to npm
-        run: npm publish --access public
+        run: npm publish --access public --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Show success
+        if: success()
+        run: echo "✅ Published @heulaulab/intai successfully!"
