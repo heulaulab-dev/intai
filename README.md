@@ -233,10 +233,26 @@ intai/
 - **Runtime**: Node.js 18+
 - **Language**: TypeScript 5.6
 - **CLI**: Commander.js
-- **Scraping**: Playwright
+- **Scraping**: Cheerio (lightweight, no browser needed)
 - **AI**: OpenAI SDK
 - **Output**: Chalk, Boxen, Ora
 
+---
+
+## Scraping
+
+By default, intai uses a lightweight scraper based on Cheerio that works without installing a browser. This is fast and has no system dependencies.
+
+**Optional: Enhanced scraping with Playwright**
+
+If you need better JavaScript-rendered content, install Playwright:
+
+```bash
+npm run install:browser
+# or
+npx playwright install chromium
+```
+        
 ---
 
 ## License

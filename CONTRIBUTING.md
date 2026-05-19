@@ -9,7 +9,7 @@ Thanks for your interest in contributing!
 git clone https://github.com/heulaulab-dev/intai.git
 cd intai
 
-# Install dependencies
+# Install dependencies (no browser required by default)
 npm install
 
 # Build the project
@@ -22,6 +22,14 @@ npm link
 intai analyze https://example.com
 intai outreach https://example.com
 intai config get
+```
+
+## Scraping
+
+The project uses Cheerio by default for lightweight scraping. To enable Playwright-based scraping:
+
+```bash
+npm run install:browser
 ```
 
 ## Project Structure
