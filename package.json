@@ -1,0 +1,43 @@
+{
+  "name": "@heulaulab/intai",
+  "version": "0.1.0",
+  "description": "AI-assisted prospect research CLI for small agencies and freelancers",
+  "type": "module",
+  "bin": {
+    "intai": "./dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsc --watch",
+    "lint": "eslint src --ext .ts"
+  },
+  "keywords": [
+    "cli",
+    "ai",
+    "prospecting",
+    "research",
+    "outreach"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@ai-sdk/openai": "^1.0.0",
+    "chalk": "^5.3.0",
+    "commander": "^12.0.0",
+    "dotenv": "^16.4.0",
+    "openai": "^5.0.0",
+    "ora": "^8.0.0",
+    "playwright": "^1.45.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.6.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
