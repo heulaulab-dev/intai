@@ -12,6 +12,8 @@ export const MODELS = {
 
 interface Config {
   apiKey?: string;
+  baseURL?: string;
+  model?: string;
 }
 
 function loadConfig(): Config {
@@ -38,5 +40,9 @@ export function getOpenAIConfig() {
     process.exit(1);
   }
 
-  return { apiKey };
+  const config = loadConfig();
+  const baseURL = process.env.OPENAI_BASE_URL || config.baseURL;
+  const model = config.model;
+
+  return { apiKey, baseURL, model };
 }
