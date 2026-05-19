@@ -1,8 +1,7 @@
 import { Command } from 'commander';
 import chalk from 'chalk';
 import boxen from 'boxen';
-import ora from 'ora';
-import { analyzeBusiness } from '../analyzers/analysis.js';
+import { analyzeBusiness, setProgressCallback, type AnalyzeProgress, type ProgressStage } from '../analyzers/analysis.js';
 import { parseUrl, isValidUrl } from '../utils/url.js';
 import { closeBrowser } from '../services/scraper.js';
 import type { AnalysisReport } from '../types/index.js';
@@ -20,6 +19,35 @@ const colors = {
   dim: chalk.dim,
 };
 
+const stageConfig: Record<ProgressStage, { icon: string; color: typeof colors.text; label: string }> = {
+  'init': { icon: '⚡', color: colors.secondary, label: 'INIT' },
+  'env-check': { icon: '🔍', color: colors.secondary, label: 'ENV' },
+  'url-parse': { icon: '🎯', color: colors.primary, label: 'URL' },
+  'scraper-init': { icon: '🕷️', color: colors.secondary, label: 'SCRAPER' },
+  'scraping': { icon: '⬇️', color: colors.secondary, label: 'FETCH' },
+  'scraped': { icon: '✅', color: colors.accent, label: 'DONE' },
+  'content-check': { icon: '🔧', color: colors.secondary, label: 'PROCESS' },
+  'ai-prepare': { icon: '📦', color: colors.warning, label: 'PREP' },
+  'ai-send': { icon: '📤', color: colors.warning, label: 'SEND' },
+  'ai-waiting': { icon: '🧠', color: colors.warning, label: 'THINK' },
+  'ai-response': { icon: '📥', color: colors.accent, label: 'RECV' },
+  'ai-parsing': { icon: '⚙️', color: colors.secondary, label: 'PARSE' },
+  'complete': { icon: '✨', color: colors.accent, label: 'DONE' },
+  'error': { icon: '❌', color: colors.danger, label: 'ERROR' },
+};
+
+function formatProgress(progress: AnalyzeProgress): string {
+  const config = stageConfig[progress.stage] || { icon: '•', color: colors.text, label: '---' };
+
+  const mainLine = `${config.icon} ${config.color.bold(config.label)} ${config.color(progress.message)}`;
+
+  if (progress.details) {
+    return `${mainLine}\n  ${colors.dim(progress.details)}`;
+  }
+
+  return mainLine;
+}
+
 export function createAnalyzeCommand(): Command {
   const command = new Command('analyze');
   command
@@ -27,34 +55,46 @@ export function createAnalyzeCommand(): Command {
     .argument('<url>', 'Website URL to analyze')
     .option('-j, --json', 'Output as JSON')
     .action(async (url: string, options: { json?: boolean }) => {
-      const spinner = ora({
-        text: colors.secondary('Initializing analysis...'),
-        spinner: 'dots',
-      }).start();
+      console.log();
+      console.log(colors.dim('  Starting analysis...'));
+      console.log();
+
+      setProgressCallback((progress: AnalyzeProgress) => {
+        const lines = formatProgress(progress).split('\n');
+        lines.forEach(line => {
+          console.log(`  ${line}`);
+        });
+      });
 
       try {
         if (!isValidUrl(url)) {
-          spinner.fail(colors.danger('Invalid URL'));
+          console.log();
+          console.log(
+            boxen(
+              `${colors.danger('✗ Invalid URL')}\n\n${colors.muted('Please provide a valid URL like https://example.com')}`,
+              { padding: 1, borderColor: 'red', borderStyle: 'classic', backgroundColor: 'black' }
+            )
+          );
           process.exit(1);
         }
 
         const normalizedUrl = parseUrl(url);
-        spinner.text = colors.secondary('Scraping website...');
+        console.log(colors.dim(`  └─ ${normalizedUrl}`));
+        console.log();
 
         const report = await analyzeBusiness(normalizedUrl);
-        spinner.succeed(colors.accent('Analysis complete!'));
 
+        console.log();
         if (options.json) {
           console.log(JSON.stringify(report, null, 2));
         } else {
           printReport(report);
         }
       } catch (error) {
-        spinner.fail(colors.danger('Analysis failed'));
-        console.error();
+        console.log();
         console.error(
           boxen(
-            `${colors.danger('✗ Error')}\n\n${error instanceof Error ? error.message : 'Unknown error'}`,
+            `${colors.danger('✗ Analysis Failed')}\n\n${error instanceof Error ? error.message : 'Unknown error'}`,
             {
               padding: 1,
               borderColor: 'red',
@@ -65,6 +105,7 @@ export function createAnalyzeCommand(): Command {
         );
         process.exit(1);
       } finally {
+        setProgressCallback(null);
         await closeBrowser();
       }
     });
