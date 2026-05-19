@@ -7,6 +7,8 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'fs';
 
 interface Config {
   apiKey?: string;
+  baseURL?: string;
+  model?: string;
 }
 
 const CONFIG_DIR = join(homedir(), '.intai');
@@ -43,6 +45,10 @@ export function createConfigCommand(): Command {
 
           if (key === 'api-key' || key === 'api_key') {
             config.apiKey = value;
+          } else if (key === 'base-url' || key === 'base_url') {
+            config.baseURL = value;
+          } else if (key === 'model') {
+            config.model = value;
           } else {
             console.error();
             console.error(chalk.red('✗ ') + chalk.red(`Unknown configuration key: ${key}`));
@@ -79,6 +85,16 @@ export function createConfigCommand(): Command {
             } else {
               console.log(`  ${chalk.gray('api-key:')} ${chalk.yellow('not set')}`);
             }
+            if (config.baseURL) {
+              console.log(`  ${chalk.gray('base-url:')} ${chalk.green(config.baseURL)}`);
+            } else {
+              console.log(`  ${chalk.gray('base-url:')} ${chalk.yellow('not set')}`);
+            }
+            if (config.model) {
+              console.log(`  ${chalk.gray('model:')} ${chalk.green(config.model)}`);
+            } else {
+              console.log(`  ${chalk.gray('model:')} ${chalk.yellow('not set (default: gpt-4o)')}`);
+            }
             console.log();
           } else {
             if (key === 'api-key' || key === 'api_key') {
@@ -88,6 +104,24 @@ export function createConfigCommand(): Command {
               } else {
                 console.error();
                 console.error(chalk.yellow('⚠ api-key is not set'));
+                process.exit(1);
+              }
+            } else if (key === 'base-url' || key === 'base_url') {
+              if (config.baseURL) {
+                console.log(`  ${chalk.gray('base-url:')}`);
+                console.log(`  ${chalk.green(config.baseURL)}`);
+              } else {
+                console.error();
+                console.error(chalk.yellow('⚠ base-url is not set'));
+                process.exit(1);
+              }
+            } else if (key === 'model') {
+              if (config.model) {
+                console.log(`  ${chalk.gray('model:')}`);
+                console.log(`  ${chalk.green(config.model)}`);
+              } else {
+                console.error();
+                console.error(chalk.yellow('⚠ model is not set (default: gpt-4o)'));
                 process.exit(1);
               }
             } else {
@@ -115,6 +149,28 @@ export function createConfigCommand(): Command {
             } else {
               console.error();
               console.error(chalk.yellow('⚠ api-key was not set'));
+              process.exit(1);
+            }
+          } else if (key === 'base-url' || key === 'base_url') {
+            if (config.baseURL) {
+              delete config.baseURL;
+              saveConfig(config);
+              console.log();
+              console.log(chalk.green('✓ base-url has been removed'));
+            } else {
+              console.error();
+              console.error(chalk.yellow('⚠ base-url was not set'));
+              process.exit(1);
+            }
+          } else if (key === 'model') {
+            if (config.model) {
+              delete config.model;
+              saveConfig(config);
+              console.log();
+              console.log(chalk.green('✓ model has been removed'));
+            } else {
+              console.error();
+              console.error(chalk.yellow('⚠ model was not set'));
               process.exit(1);
             }
           } else {

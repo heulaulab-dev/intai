@@ -4,13 +4,16 @@ import { getOpenAIConfig, MODELS } from '../utils/env.js';
 export async function analyzeWithAI<T>(
   prompt: string,
   content: string,
-  model: string = MODELS.ANALYSIS
+  model?: string
 ): Promise<T> {
-  const { apiKey } = getOpenAIConfig();
-  const client = new OpenAI({ apiKey });
+  const { apiKey, baseURL, model: configModel } = getOpenAIConfig();
+  const client = new OpenAI({ apiKey, baseURL });
+
+  // Use provided model, config model, or default
+  const effectiveModel = model || configModel || MODELS.ANALYSIS;
 
   const response = await client.chat.completions.create({
-    model,
+    model: effectiveModel,
     messages: [
       {
         role: 'system',
