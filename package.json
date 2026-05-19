@@ -1,6 +1,6 @@
 {
   "name": "@heulaulab/intai",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "AI-assisted prospect research CLI for small agencies and freelancers",
   "type": "module",
   "bin": {
