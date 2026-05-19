@@ -9,6 +9,7 @@ interface Config {
   apiKey?: string;
   baseURL?: string;
   model?: string;
+  scraperMode?: string;
 }
 
 // Projectdiscovery-inspired color palette
@@ -27,7 +28,7 @@ const colors = {
 const CONFIG_DIR = join(homedir(), '.intai');
 const CONFIG_FILE = join(CONFIG_DIR, 'config.json');
 
-function loadConfig(): Config {
+export function loadConfig(): Config {
   try {
     if (existsSync(CONFIG_FILE)) {
       return JSON.parse(readFileSync(CONFIG_FILE, 'utf-8'));
@@ -62,6 +63,13 @@ export function createConfigCommand(): Command {
             config.baseURL = value;
           } else if (key === 'model') {
             config.model = value;
+          } else if (key === 'scraper-mode' || key === 'scraper_mode') {
+            if (value !== 'lightweight' && value !== 'playwright') {
+              console.error();
+              console.error(colors.danger('✗ scraper-mode must be "lightweight" or "playwright"'));
+              process.exit(1);
+            }
+            config.scraperMode = value;
           } else {
             console.error();
             console.error(colors.danger('✗ ') + colors.danger(`Unknown configuration key: ${key}`));
@@ -111,6 +119,11 @@ export function createConfigCommand(): Command {
             } else {
               console.log(`  ${colors.dim('model:')} ${colors.warning('not set (default: gpt-4o)')}`);
             }
+            if (config.scraperMode) {
+              console.log(`  ${colors.dim('scraper-mode:')} ${colors.accent(config.scraperMode)}`);
+            } else {
+              console.log(`  ${colors.dim('scraper-mode:')} ${colors.warning('not set (default: lightweight)')}`);
+            }
             console.log();
           } else {
             if (key === 'api-key' || key === 'api_key') {
@@ -138,6 +151,15 @@ export function createConfigCommand(): Command {
               } else {
                 console.error();
                 console.error(colors.warning('⚠ model is not set (default: gpt-4o)'));
+                process.exit(1);
+              }
+            } else if (key === 'scraper-mode' || key === 'scraper_mode') {
+              if (config.scraperMode) {
+                console.log(`  ${colors.dim('scraper-mode:')}`);
+                console.log(`  ${colors.accent(config.scraperMode)}`);
+              } else {
+                console.error();
+                console.error(colors.warning('⚠ scraper-mode is not set (default: lightweight)'));
                 process.exit(1);
               }
             } else {
@@ -187,6 +209,17 @@ export function createConfigCommand(): Command {
             } else {
               console.error();
               console.error(colors.warning('⚠ model was not set'));
+              process.exit(1);
+            }
+          } else if (key === 'scraper-mode' || key === 'scraper_mode') {
+            if (config.scraperMode) {
+              delete config.scraperMode;
+              saveConfig(config);
+              console.log();
+              console.log(colors.accent('✓ scraper-mode has been removed'));
+            } else {
+              console.error();
+              console.error(colors.warning('⚠ scraper-mode was not set'));
               process.exit(1);
             }
           } else {
