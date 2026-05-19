@@ -35,9 +35,21 @@ export async function analyzeWithAI<T>(
   }
 
   try {
-    const cleaned = text.replace(/^```json\s*/i, '').replace(/\s*```$/i, '').trim();
+    // Try to extract JSON, handling thinking blocks and other formats
+    let cleaned = text
+      // Remove thinking blocks (Claude/MiniMax extended format)
+      .replace(/<thinking>[\s\S]*?<\/thinking>/gi, '')
+      .replace(/<think>[\s\S]*?<\/think>/gi, '')
+      // Remove markdown code blocks
+      .replace(/^```json\s*/i, '')
+      .replace(/^```\s*/i, '')
+      .replace(/\s*```$/i, '')
+      .trim();
+
     return JSON.parse(cleaned) as T;
   } catch {
+    // Log the raw response for debugging
+    console.error('Raw AI response:', text.slice(0, 500));
     throw new Error('Failed to parse AI response as JSON');
   }
 }
