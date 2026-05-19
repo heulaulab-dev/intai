@@ -1,10 +1,18 @@
+import chalk from 'chalk';
 import ora, { type Ora } from 'ora';
+
+// Projectdiscovery-inspired color palette
+const colors = {
+  secondary: chalk.cyan,
+  accent: chalk.green,
+  danger: chalk.red,
+};
 
 let spinner: Ora | null = null;
 
 export function startSpinner(text: string): void {
   spinner = ora({
-    text: chalk.cyan(text),
+    text: colors.secondary(text),
     spinner: 'dots',
     color: 'cyan',
   }).start();
@@ -12,14 +20,14 @@ export function startSpinner(text: string): void {
 
 export function succeedSpinner(text: string): void {
   if (spinner) {
-    spinner.succeed(chalk.green(text));
+    spinner.succeed(colors.accent(text));
     spinner = null;
   }
 }
 
 export function failSpinner(text: string): void {
   if (spinner) {
-    spinner.fail(chalk.red(text));
+    spinner.fail(colors.danger(text));
     spinner = null;
   }
 }
@@ -30,5 +38,3 @@ export function stopSpinner(): void {
     spinner = null;
   }
 }
-
-import chalk from 'chalk';

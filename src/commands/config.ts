@@ -11,6 +11,19 @@ interface Config {
   model?: string;
 }
 
+// Projectdiscovery-inspired color palette
+const colors = {
+  bg: chalk.bgBlack,
+  primary: chalk.cyanBright,
+  secondary: chalk.cyan,
+  accent: chalk.green,
+  warning: chalk.yellow,
+  danger: chalk.red,
+  text: chalk.white,
+  muted: chalk.gray,
+  dim: chalk.dim,
+};
+
 const CONFIG_DIR = join(homedir(), '.intai');
 const CONFIG_FILE = join(CONFIG_DIR, 'config.json');
 
@@ -51,7 +64,7 @@ export function createConfigCommand(): Command {
             config.model = value;
           } else {
             console.error();
-            console.error(chalk.red('✗ ') + chalk.red(`Unknown configuration key: ${key}`));
+            console.error(colors.danger('✗ ') + colors.danger(`Unknown configuration key: ${key}`));
             process.exit(1);
           }
 
@@ -59,8 +72,8 @@ export function createConfigCommand(): Command {
           console.log();
           console.log(
             boxen(
-              `${chalk.green('✓')} ${chalk.bold(key)} has been set\n${chalk.gray('Stored in ~/.intai/config.json')}`,
-              { padding: 1, borderColor: 'green', borderStyle: 'round' }
+              `${colors.accent('✓')} ${colors.text.bold(key)} has been set\n${colors.dim('Stored in ~/.intai/config.json')}`,
+              { padding: 1, borderColor: 'green', borderStyle: 'classic', backgroundColor: 'black' }
             )
           );
         })
@@ -71,62 +84,65 @@ export function createConfigCommand(): Command {
         .argument('[key]', 'Configuration key to retrieve')
         .action((key?: string) => {
           const config = loadConfig();
+          const divider = colors.muted('━'.repeat(50));
 
           console.log();
-          console.log(chalk.cyan('━'.repeat(45)));
-          console.log(chalk.bold.cyan('  ⚙  CONFIGURATION'));
-          console.log(chalk.cyan('━'.repeat(45)));
+          console.log(divider);
+          console.log();
+          console.log(`  ${colors.secondary('▸')} ${colors.text.bold('CONFIGURATION')}`);
+          console.log();
+          console.log(divider);
           console.log();
 
           if (!key) {
             // Show all config
             if (config.apiKey) {
-              console.log(`  ${chalk.gray('api-key:')} ${chalk.green('••••••••')}${chalk.gray(' ✓')}`);
+              console.log(`  ${colors.dim('api-key:')} ${colors.accent('••••••••')}${colors.dim(' ✓')}`);
             } else {
-              console.log(`  ${chalk.gray('api-key:')} ${chalk.yellow('not set')}`);
+              console.log(`  ${colors.dim('api-key:')} ${colors.warning('not set')}`);
             }
             if (config.baseURL) {
-              console.log(`  ${chalk.gray('base-url:')} ${chalk.green(config.baseURL)}`);
+              console.log(`  ${colors.dim('base-url:')} ${colors.accent(config.baseURL)}`);
             } else {
-              console.log(`  ${chalk.gray('base-url:')} ${chalk.yellow('not set')}`);
+              console.log(`  ${colors.dim('base-url:')} ${colors.warning('not set')}`);
             }
             if (config.model) {
-              console.log(`  ${chalk.gray('model:')} ${chalk.green(config.model)}`);
+              console.log(`  ${colors.dim('model:')} ${colors.accent(config.model)}`);
             } else {
-              console.log(`  ${chalk.gray('model:')} ${chalk.yellow('not set (default: gpt-4o)')}`);
+              console.log(`  ${colors.dim('model:')} ${colors.warning('not set (default: gpt-4o)')}`);
             }
             console.log();
           } else {
             if (key === 'api-key' || key === 'api_key') {
               if (config.apiKey) {
-                console.log(`  ${chalk.gray('api-key:')}`);
-                console.log(`  ${chalk.green(config.apiKey)}`);
+                console.log(`  ${colors.dim('api-key:')}`);
+                console.log(`  ${colors.accent(config.apiKey)}`);
               } else {
                 console.error();
-                console.error(chalk.yellow('⚠ api-key is not set'));
+                console.error(colors.warning('⚠ api-key is not set'));
                 process.exit(1);
               }
             } else if (key === 'base-url' || key === 'base_url') {
               if (config.baseURL) {
-                console.log(`  ${chalk.gray('base-url:')}`);
-                console.log(`  ${chalk.green(config.baseURL)}`);
+                console.log(`  ${colors.dim('base-url:')}`);
+                console.log(`  ${colors.accent(config.baseURL)}`);
               } else {
                 console.error();
-                console.error(chalk.yellow('⚠ base-url is not set'));
+                console.error(colors.warning('⚠ base-url is not set'));
                 process.exit(1);
               }
             } else if (key === 'model') {
               if (config.model) {
-                console.log(`  ${chalk.gray('model:')}`);
-                console.log(`  ${chalk.green(config.model)}`);
+                console.log(`  ${colors.dim('model:')}`);
+                console.log(`  ${colors.accent(config.model)}`);
               } else {
                 console.error();
-                console.error(chalk.yellow('⚠ model is not set (default: gpt-4o)'));
+                console.error(colors.warning('⚠ model is not set (default: gpt-4o)'));
                 process.exit(1);
               }
             } else {
               console.error();
-              console.error(chalk.red('✗ ') + chalk.red(`Unknown configuration key: ${key}`));
+              console.error(colors.danger('✗ ') + colors.danger(`Unknown configuration key: ${key}`));
               process.exit(1);
             }
           }
@@ -145,10 +161,10 @@ export function createConfigCommand(): Command {
               delete config.apiKey;
               saveConfig(config);
               console.log();
-              console.log(chalk.green('✓ api-key has been removed'));
+              console.log(colors.accent('✓ api-key has been removed'));
             } else {
               console.error();
-              console.error(chalk.yellow('⚠ api-key was not set'));
+              console.error(colors.warning('⚠ api-key was not set'));
               process.exit(1);
             }
           } else if (key === 'base-url' || key === 'base_url') {
@@ -156,10 +172,10 @@ export function createConfigCommand(): Command {
               delete config.baseURL;
               saveConfig(config);
               console.log();
-              console.log(chalk.green('✓ base-url has been removed'));
+              console.log(colors.accent('✓ base-url has been removed'));
             } else {
               console.error();
-              console.error(chalk.yellow('⚠ base-url was not set'));
+              console.error(colors.warning('⚠ base-url was not set'));
               process.exit(1);
             }
           } else if (key === 'model') {
@@ -167,15 +183,15 @@ export function createConfigCommand(): Command {
               delete config.model;
               saveConfig(config);
               console.log();
-              console.log(chalk.green('✓ model has been removed'));
+              console.log(colors.accent('✓ model has been removed'));
             } else {
               console.error();
-              console.error(chalk.yellow('⚠ model was not set'));
+              console.error(colors.warning('⚠ model was not set'));
               process.exit(1);
             }
           } else {
             console.error();
-            console.error(chalk.red('✗ ') + chalk.red(`Unknown configuration key: ${key}`));
+            console.error(colors.danger('✗ ') + colors.danger(`Unknown configuration key: ${key}`));
             process.exit(1);
           }
         })

@@ -7,6 +7,19 @@ import { parseUrl, isValidUrl } from '../utils/url.js';
 import { closeBrowser } from '../services/scraper.js';
 import type { OutreachMessage } from '../types/index.js';
 
+// Projectdiscovery-inspired color palette
+const colors = {
+  bg: chalk.bgBlack,
+  primary: chalk.cyanBright,
+  secondary: chalk.cyan,
+  accent: chalk.green,
+  warning: chalk.yellow,
+  danger: chalk.red,
+  text: chalk.white,
+  muted: chalk.gray,
+  dim: chalk.dim,
+};
+
 export function createOutreachCommand(): Command {
   const command = new Command('outreach');
   command
@@ -15,21 +28,21 @@ export function createOutreachCommand(): Command {
     .option('-j, --json', 'Output as JSON')
     .action(async (url: string, options: { json?: boolean }) => {
       const spinner = ora({
-        text: chalk.cyan('Initializing outreach generator...'),
+        text: colors.secondary('Initializing outreach generator...'),
         spinner: 'dots',
       }).start();
 
       try {
         if (!isValidUrl(url)) {
-          spinner.fail(chalk.red('Invalid URL'));
+          spinner.fail(colors.danger('Invalid URL'));
           process.exit(1);
         }
 
         const normalizedUrl = parseUrl(url);
-        spinner.text = chalk.cyan('Analyzing business & crafting message...');
+        spinner.text = colors.secondary('Analyzing business & crafting message...');
 
         const message = await generateOutreach(normalizedUrl);
-        spinner.succeed(chalk.green('Message crafted!'));
+        spinner.succeed(colors.accent('Message crafted!'));
 
         if (options.json) {
           console.log(JSON.stringify(message, null, 2));
@@ -37,15 +50,16 @@ export function createOutreachCommand(): Command {
           printOutreach(message);
         }
       } catch (error) {
-        spinner.fail(chalk.red('Generation failed'));
+        spinner.fail(colors.danger('Generation failed'));
         console.error();
         console.error(
           boxen(
-            `${chalk.red('✗ Error')}\n\n${error instanceof Error ? error.message : 'Unknown error'}`,
+            `${colors.danger('✗ Error')}\n\n${error instanceof Error ? error.message : 'Unknown error'}`,
             {
               padding: 1,
               borderColor: 'red',
-              borderStyle: 'round',
+              borderStyle: 'classic',
+              backgroundColor: 'black'
             }
           )
         );
@@ -59,65 +73,80 @@ export function createOutreachCommand(): Command {
 }
 
 function printOutreach(message: OutreachMessage): void {
+  const divider = colors.muted('━'.repeat(50));
+
   console.log();
-  console.log(chalk.cyan('━'.repeat(45)));
-  console.log(chalk.bold.cyan('  ✉  OUTREACH MESSAGE'));
-  console.log(chalk.cyan('━'.repeat(45)));
+  console.log(divider);
+  console.log();
+  console.log(`  ${colors.accent('▸')} ${colors.text.bold('OUTREACH MESSAGE')}`);
+  console.log(`  ${colors.dim(message.businessName)}`);
+  console.log();
+  console.log(divider);
   console.log();
 
-  // To
-  console.log(chalk.bold('  📍 TO'));
-  console.log(chalk.gray('  ' + '─'.repeat(40)));
-  console.log(`  ${chalk.white(message.businessName)}`);
+  // To section
+  console.log(`  ${colors.secondary('▸')} ${colors.text.bold('TO')}`);
+  console.log(colors.muted('  ' + '─'.repeat(45)));
+  console.log(`  ${colors.text(message.businessName)}`);
   console.log();
 
   // Subject
-  console.log(chalk.bold('  📌 SUBJECT'));
-  console.log(chalk.gray('  ' + '─'.repeat(40)));
+  console.log(`  ${colors.primary('▸')} ${colors.text.bold('SUBJECT')}`);
+  console.log(colors.muted('  ' + '─'.repeat(45)));
   console.log(
     boxen(
-      ` ${chalk.green(message.subject)} `,
-      { padding: { top: 0, bottom: 0, left: 2, right: 2 }, borderColor: 'green', borderStyle: 'round' }
+      ` ${colors.accent(message.subject)} `,
+      {
+        padding: { top: 0, bottom: 0, left: 2, right: 2 },
+        borderColor: 'green',
+        borderStyle: 'classic',
+        backgroundColor: 'black'
+      }
     )
   );
   console.log();
 
   // Body
-  console.log(chalk.bold('  📝 MESSAGE'));
-  console.log(chalk.gray('  ' + '─'.repeat(40)));
+  console.log(`  ${colors.warning('▸')} ${colors.text.bold('MESSAGE')}`);
+  console.log(colors.muted('  ' + '─'.repeat(45)));
   const lines = message.body.split('\n');
   lines.forEach((line) => {
-    console.log(`  ${chalk.white(line)}`);
+    console.log(`  ${colors.text(line)}`);
   });
   console.log();
 
   // Pain Points
   if (message.keyPainPoints.length > 0) {
-    console.log(chalk.bold('  🎯 PAIN POINTS'));
-    console.log(chalk.gray('  ' + '─'.repeat(40)));
+    console.log(`  ${colors.danger('▸')} ${colors.text.bold('PAIN POINTS')}`);
+    console.log(colors.muted('  ' + '─'.repeat(45)));
     message.keyPainPoints.forEach((point) => {
-      console.log(`    ${chalk.red('•')} ${chalk.gray(point)}`);
+      console.log(`    ${colors.danger('■')} ${colors.dim(point)}`);
     });
     console.log();
   }
 
   // Personalization
   if (message.personalizationNotes.length > 0) {
-    console.log(chalk.bold('  ✨ PERSONALIZATION'));
-    console.log(chalk.gray('  ' + '─'.repeat(40)));
+    console.log(`  ${colors.secondary('▸')} ${colors.text.bold('PERSONALIZATION')}`);
+    console.log(colors.muted('  ' + '─'.repeat(45)));
     message.personalizationNotes.forEach((note) => {
-      console.log(`    ${chalk.cyan('›')} ${chalk.gray(note)}`);
+      console.log(`    ${colors.primary('▸')} ${colors.dim(note)}`);
     });
     console.log();
   }
 
-  console.log(chalk.cyan('━'.repeat(45)));
+  console.log(divider);
   console.log();
 
   console.log(
     boxen(
-      `${chalk.cyan('✋')} ${chalk.white('Copy the message above and send it to ')}${chalk.yellow(message.businessName)}`,
-      { padding: 1, borderColor: 'cyan', borderStyle: 'round' }
+      `${colors.warning('▸')} ${colors.text('Copy the message above and send it to ')}${colors.accent(message.businessName)}`,
+      {
+        padding: 1,
+        borderColor: 'cyan',
+        borderStyle: 'classic',
+        backgroundColor: 'black'
+      }
     )
   );
   console.log();

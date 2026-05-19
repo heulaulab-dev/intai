@@ -7,6 +7,19 @@ import { parseUrl, isValidUrl } from '../utils/url.js';
 import { closeBrowser } from '../services/scraper.js';
 import type { AnalysisReport } from '../types/index.js';
 
+// Projectdiscovery-inspired color palette
+const colors = {
+  bg: chalk.bgBlack,
+  primary: chalk.cyanBright,
+  secondary: chalk.cyan,
+  accent: chalk.green,
+  warning: chalk.yellow,
+  danger: chalk.red,
+  text: chalk.white,
+  muted: chalk.gray,
+  dim: chalk.dim,
+};
+
 export function createAnalyzeCommand(): Command {
   const command = new Command('analyze');
   command
@@ -15,21 +28,21 @@ export function createAnalyzeCommand(): Command {
     .option('-j, --json', 'Output as JSON')
     .action(async (url: string, options: { json?: boolean }) => {
       const spinner = ora({
-        text: chalk.cyan('Initializing analysis...'),
+        text: colors.secondary('Initializing analysis...'),
         spinner: 'dots',
       }).start();
 
       try {
         if (!isValidUrl(url)) {
-          spinner.fail(chalk.red('Invalid URL'));
+          spinner.fail(colors.danger('Invalid URL'));
           process.exit(1);
         }
 
         const normalizedUrl = parseUrl(url);
-        spinner.text = chalk.cyan('Scraping website...');
+        spinner.text = colors.secondary('Scraping website...');
 
         const report = await analyzeBusiness(normalizedUrl);
-        spinner.succeed(chalk.green('Analysis complete!'));
+        spinner.succeed(colors.accent('Analysis complete!'));
 
         if (options.json) {
           console.log(JSON.stringify(report, null, 2));
@@ -37,15 +50,16 @@ export function createAnalyzeCommand(): Command {
           printReport(report);
         }
       } catch (error) {
-        spinner.fail(chalk.red('Analysis failed'));
+        spinner.fail(colors.danger('Analysis failed'));
         console.error();
         console.error(
           boxen(
-            `${chalk.red('✗ Error')}\n\n${error instanceof Error ? error.message : 'Unknown error'}`,
+            `${colors.danger('✗ Error')}\n\n${error instanceof Error ? error.message : 'Unknown error'}`,
             {
               padding: 1,
               borderColor: 'red',
-              borderStyle: 'round',
+              borderStyle: 'classic',
+              backgroundColor: 'black'
             }
           )
         );
@@ -59,32 +73,45 @@ export function createAnalyzeCommand(): Command {
 }
 
 function printReport(report: AnalysisReport): void {
+  const divider = colors.muted('━'.repeat(50));
+
   console.log();
-  console.log(chalk.cyan('━'.repeat(45)));
-  console.log(chalk.bold.cyan('  📊 ANALYSIS REPORT'));
-  console.log(chalk.cyan('━'.repeat(45)));
+  console.log(divider);
+  console.log();
+  console.log(`  ${colors.primary('▸')} ${colors.text.bold('ANALYSIS REPORT')}`);
+  console.log(`  ${colors.dim(report.websiteUrl)}`);
+  console.log();
+  console.log(divider);
   console.log();
 
-  // Business name
+  // Business name card
   console.log(
     boxen(
-      `${chalk.bold.white(' ' + (report.businessName || 'Unknown Business'))}\n` +
-      chalk.gray(` ${report.websiteUrl}`),
-      { padding: 1, borderColor: 'cyan', borderStyle: 'round' }
+      `${colors.text.bold(' ' + (report.businessName || 'Unknown Business'))}\n` +
+      colors.muted(` ${report.websiteUrl}`),
+      {
+        padding: 1,
+        borderColor: 'cyan',
+        borderStyle: 'classic',
+        backgroundColor: 'black'
+      }
     )
   );
   console.log();
 
   // Operational Signals
   if (report.operationalSignals.length > 0) {
-    console.log(chalk.bold('  ⚡ OPERATIONAL SIGNALS'));
-    console.log(chalk.gray('  ' + '─'.repeat(40)));
-    report.operationalSignals.forEach((signal, i) => {
-      const icon = signal.confidence === 'high' ? chalk.green('✓') : signal.confidence === 'medium' ? chalk.yellow('~') : chalk.gray('○');
+    console.log(`  ${colors.primary('▸')} ${colors.text.bold('OPERATIONAL SIGNALS')}`);
+    console.log(colors.muted('  ' + '─'.repeat(45)));
+    report.operationalSignals.forEach((signal) => {
+      const icon = signal.confidence === 'high'
+        ? colors.accent('●')
+        : signal.confidence === 'medium'
+          ? colors.warning('●')
+          : colors.muted('○');
       console.log();
-      console.log(`    ${icon} ${chalk.white(signal.indicator)}`);
-      console.log(`       ${chalk.gray(signal.evidence)}`);
-      if (i < report.operationalSignals.length - 1) console.log();
+      console.log(`    ${icon} ${colors.text(signal.indicator)}`);
+      console.log(`    ${colors.dim(signal.evidence)}`);
     });
   }
 
@@ -92,14 +119,18 @@ function printReport(report: AnalysisReport): void {
 
   // Potential Problems
   if (report.potentialProblems.length > 0) {
-    console.log(chalk.bold('  🎯 PROBLEMS DETECTED'));
-    console.log(chalk.gray('  ' + '─'.repeat(40)));
+    console.log(`  ${colors.danger('▸')} ${colors.text.bold('PROBLEMS DETECTED')}`);
+    console.log(colors.muted('  ' + '─'.repeat(45)));
     report.potentialProblems.forEach((problem) => {
-      const color = problem.severity === 'critical' ? chalk.red : problem.severity === 'moderate' ? chalk.yellow : chalk.gray;
+      const color = problem.severity === 'critical'
+        ? colors.danger
+        : problem.severity === 'moderate'
+          ? colors.warning
+          : colors.muted;
       const severity = `[${problem.severity.toUpperCase()}]`;
       console.log();
-      console.log(`    ${chalk.red('●')} ${color(problem.problem)} ${chalk.gray(severity)}`);
-      console.log(`       ${chalk.gray(problem.description)}`);
+      console.log(`    ${colors.danger('■')} ${color(problem.problem)} ${colors.dim(severity)}`);
+      console.log(`    ${colors.dim(problem.description)}`);
     });
   }
 
@@ -107,36 +138,40 @@ function printReport(report: AnalysisReport): void {
 
   // Suggested Tools
   if (report.suggestedTools.length > 0) {
-    console.log(chalk.bold('  🛠  SUGGESTED TOOLS'));
-    console.log(chalk.gray('  ' + '─'.repeat(40)));
+    console.log(`  ${colors.accent('▸')} ${colors.text.bold('SUGGESTED TOOLS')}`);
+    console.log(colors.muted('  ' + '─'.repeat(45)));
     report.suggestedTools.forEach((tool) => {
-      const color = tool.priority === 'high' ? chalk.green : tool.priority === 'medium' ? chalk.yellow : chalk.gray;
+      const color = tool.priority === 'high'
+        ? colors.accent
+        : tool.priority === 'medium'
+          ? colors.warning
+          : colors.muted;
       console.log();
-      console.log(`    ${color('→')} ${chalk.white(tool.tool)} ${chalk.gray(`[${tool.priority}]`)}`);
-      console.log(`       ${chalk.gray(tool.rationale)}`);
+      console.log(`    ${color('▸')} ${colors.text(tool.tool)} ${colors.dim(`[${tool.priority}]`)}`);
+      console.log(`    ${colors.dim(tool.rationale)}`);
     });
   }
 
   console.log();
-  console.log(chalk.cyan('━'.repeat(45)));
+  console.log(divider);
   console.log();
 
   // Summary
-  console.log(chalk.bold('  💡 SUMMARY'));
-  console.log(chalk.gray('  ' + '─'.repeat(40)));
+  console.log(`  ${colors.warning('▸')} ${colors.text.bold('SUMMARY')}`);
+  console.log(colors.muted('  ' + '─'.repeat(45)));
   console.log();
-  console.log(`  ${chalk.white(report.summary)}`);
+  console.log(`  ${colors.text(report.summary)}`);
 
   // Tech stack
   if (report.detectedTechStack && report.detectedTechStack.length > 0) {
     console.log();
-    console.log(chalk.bold('  🔧 TECH STACK'));
-    console.log(chalk.gray('  ' + '─'.repeat(40)));
+    console.log(`  ${colors.secondary('▸')} ${colors.text.bold('TECH STACK')}`);
+    console.log(colors.muted('  ' + '─'.repeat(45)));
     console.log();
-    console.log(`  ${chalk.gray(report.detectedTechStack.join(chalk.gray(' • ')))}`);
+    console.log(`  ${report.detectedTechStack.map(t => colors.dim(t)).join(colors.muted(' · '))}`);
   }
 
   console.log();
-  console.log(chalk.cyan('━'.repeat(45)));
+  console.log(divider);
   console.log();
 }
