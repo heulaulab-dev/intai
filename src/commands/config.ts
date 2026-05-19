@@ -1,5 +1,6 @@
 import { Command } from 'commander';
 import chalk from 'chalk';
+import boxen from 'boxen';
 import { homedir } from 'os';
 import { join } from 'path';
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'fs';
@@ -43,12 +44,19 @@ export function createConfigCommand(): Command {
           if (key === 'api-key' || key === 'api_key') {
             config.apiKey = value;
           } else {
-            console.error(chalk.red(`Unknown configuration key: ${key}`));
+            console.error();
+            console.error(chalk.red('✗ ') + chalk.red(`Unknown configuration key: ${key}`));
             process.exit(1);
           }
 
           saveConfig(config);
-          console.log(chalk.green(`✓ ${key} has been set`));
+          console.log();
+          console.log(
+            boxen(
+              `${chalk.green('✓')} ${chalk.bold(key)} has been set\n${chalk.gray('Stored in ~/.intai/config.json')}`,
+              { padding: 1, borderColor: 'green', borderStyle: 'round' }
+            )
+          );
         })
     )
     .addCommand(
@@ -58,27 +66,37 @@ export function createConfigCommand(): Command {
         .action((key?: string) => {
           const config = loadConfig();
 
-          if (!key) {
-            console.log(chalk.bold('Current configuration:\n'));
-            if (config.apiKey) {
-              console.log(`api-key: ${chalk.green('***')}${chalk.gray(' (set)')}`);
-            } else {
-              console.log(`api-key: ${chalk.gray('not set')}`);
-            }
-            return;
-          }
+          console.log();
+          console.log(chalk.cyan('━'.repeat(45)));
+          console.log(chalk.bold.cyan('  ⚙  CONFIGURATION'));
+          console.log(chalk.cyan('━'.repeat(45)));
+          console.log();
 
-          if (key === 'api-key' || key === 'api_key') {
+          if (!key) {
+            // Show all config
             if (config.apiKey) {
-              console.log(config.apiKey);
+              console.log(`  ${chalk.gray('api-key:')} ${chalk.green('••••••••')}${chalk.gray(' ✓')}`);
             } else {
-              console.error(chalk.yellow('api-key is not set'));
+              console.log(`  ${chalk.gray('api-key:')} ${chalk.yellow('not set')}`);
+            }
+            console.log();
+          } else {
+            if (key === 'api-key' || key === 'api_key') {
+              if (config.apiKey) {
+                console.log(`  ${chalk.gray('api-key:')}`);
+                console.log(`  ${chalk.green(config.apiKey)}`);
+              } else {
+                console.error();
+                console.error(chalk.yellow('⚠ api-key is not set'));
+                process.exit(1);
+              }
+            } else {
+              console.error();
+              console.error(chalk.red('✗ ') + chalk.red(`Unknown configuration key: ${key}`));
               process.exit(1);
             }
-          } else {
-            console.error(chalk.red(`Unknown configuration key: ${key}`));
-            process.exit(1);
           }
+          console.log();
         })
     )
     .addCommand(
@@ -92,13 +110,16 @@ export function createConfigCommand(): Command {
             if (config.apiKey) {
               delete config.apiKey;
               saveConfig(config);
-              console.log(chalk.green(`✓ api-key has been removed`));
+              console.log();
+              console.log(chalk.green('✓ api-key has been removed'));
             } else {
-              console.error(chalk.yellow('api-key was not set'));
+              console.error();
+              console.error(chalk.yellow('⚠ api-key was not set'));
               process.exit(1);
             }
           } else {
-            console.error(chalk.red(`Unknown configuration key: ${key}`));
+            console.error();
+            console.error(chalk.red('✗ ') + chalk.red(`Unknown configuration key: ${key}`));
             process.exit(1);
           }
         })

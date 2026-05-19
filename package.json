@@ -12,20 +12,30 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
-    "dev": "tsc --watch",
-    "lint": "eslint src --ext .ts"
+    "dev": "tsc --watch"
   },
   "keywords": [
     "cli",
     "ai",
     "prospecting",
     "research",
-    "outreach"
+    "outreach",
+    "sales",
+    "operators",
+    "business-analysis"
   ],
-  "author": "",
+  "author": "heulaulab",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/heulaulab-dev/intai"
+  },
+  "homepage": "https://github.com/heulaulab-dev/intai",
+  "bugs": {
+    "url": "https://github.com/heulaulab-dev/intai/issues"
+  },
   "dependencies": {
-    "@ai-sdk/openai": "^1.0.0",
+    "boxen": "^8.0.1",
     "chalk": "^5.3.0",
     "commander": "^12.0.0",
     "dotenv": "^16.4.0",

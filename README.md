@@ -1,8 +1,12 @@
 # @heulaulab/intai
 
-AI-assisted prospect research CLI for small agencies, freelancers, and operators.
+<!-- Badges -->
+[![npm version](https://img.shields.io/npm/v/@heulaulab/intai?style=flat-square)](https://www.npmjs.com/package/@heulaulab/intai)
+[![npm downloads](https://img.shields.io/npm/dm/@heulaulab/intai?style=flat-square)](https://www.npmjs.com/package/@heulaulab/intai)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.6-blue?style=flat-square)](https://www.typescriptlang.org/)
 
-**Repository**: https://github.com/heulaulab-dev/intai
+AI-assisted prospect research CLI for small agencies, freelancers, and operators.
 
 **Purpose**: Analyze businesses, detect operational inefficiencies, identify manual workflows, and generate personalized outreach angles.
 
@@ -10,42 +14,48 @@ AI-assisted prospect research CLI for small agencies, freelancers, and operators
 
 ---
 
+## Quick Start
+
+```bash
+# Install (one-liner)
+npm install -g @heulaulab/intai
+
+# Configure API key
+intai config set api-key <your-openai-key>
+
+# Analyze a website
+intai analyze https://example-gym.com
+
+# Generate outreach
+intai outreach https://example-gym.com
+```
+
 ## Installation
 
 ### Prerequisites
 
 - Node.js >= 18.0.0
-- npm or pnpm
 
-### Setup
-
-```bash
-# Clone the repository
-git clone <your-repo-url>
-cd intai
-
-# Install dependencies
-npm install
-
-# Copy environment file
-cp .env.example .env
-
-# Edit .env and add your OpenAI API key
-```
-
-### Get OpenAI API Key
-
-1. Go to [OpenAI Platform](https://platform.openai.com/)
-2. Create an API key
-3. Add it to your `.env` file as `OPENAI_API_KEY=sk-...`
-
-### Build
+### Install via npm
 
 ```bash
-npm run build
+npm install -g @heulaulab/intai
 ```
 
-### Run
+### Install via other package managers
+
+```bash
+# pnpm
+pnpm add -g @heulaulab/intai
+
+# yarn
+yarn global add @heulaulab/intai
+
+# bun
+bun add -g @heulaulab/intai
+```
+
+### Run without installing
 
 ```bash
 # npx
@@ -56,26 +66,23 @@ bunx @heulaulab/intai analyze <url>
 
 # pnpm
 pnpm exec @heulaulab/intai analyze <url>
-
-# yarn
-yarn dlx @heulaulab/intai analyze <url>
-
-# Link globally
-npm link
-intai analyze <url>
 ```
 
-After linking globally, use `intai` directly:
+---
+
+## Setup
 
 ### Configure API Key
 
 ```bash
-# Using npx
-npx @heulaulab/intai config set api-key sk-...
-
-# Or after global link
+# Set your OpenAI API key (stored in ~/.intai/config.json)
 intai config set api-key sk-...
+
+# Or use environment variable
+export OPENAI_API_KEY=sk-...
 ```
+
+Get your OpenAI API key at [platform.openai.com](https://platform.openai.com/)
 
 ---
 
@@ -84,10 +91,6 @@ intai config set api-key sk-...
 ### Analyze a website
 
 ```bash
-# Using npx
-npx @heulaulab/intai analyze <url>
-
-# Or after global link
 intai analyze <url>
 ```
 
@@ -102,46 +105,9 @@ intai analyze https://example-gym.com --json
 intai analyze https://example-gym.com -j
 ```
 
-**Example output:**
-
-```
-[INTAI REPORT]
-
-Business:
-FitLife Gym
-
-Operational Signals:
-  ✓✓ WhatsApp booking
-    Evidence: "Book via WhatsApp: +1-555-0123"
-  ✓ Manual class scheduling
-    Evidence: "Check our schedule page for upcoming classes"
-  ~ No member portal
-    Evidence: "Contact us to update your membership details"
-
-Potential Problems:
-  • Admin bottleneck (critical)
-    Booking requests flood owner/manager phone
-  • Communication fragmentation (moderate)
-    WhatsApp, phone, email - no unified system
-
-Suggested Internal Tools:
-  → Booking dashboard (high)
-    Automate appointment requests, reduce manual coordination
-  → Membership portal (high)
-    Self-service profile management for members
-
-Summary:
-FitLife relies heavily on manual WhatsApp coordination for bookings with no self-service option.
-This creates an admin bottleneck during peak hours and limits business scalability.
-```
-
 ### Generate outreach
 
 ```bash
-# Using npx
-npx @heulaulab/intai outreach <url>
-
-# Or after global link
 intai outreach <url>
 ```
 
@@ -156,45 +122,18 @@ intai outreach https://example-gym.com --json
 intai outreach https://example-gym.com -j
 ```
 
-**Example output:**
-
-```
-[OUTREACH MESSAGE]
-
-To:
-FitLife Gym
-
-Subject:
-Quick way to offload your booking coordination?
-
-Body:
-I noticed you handle bookings via WhatsApp - smart for simplicity, but I bet it eats into your day.
-
-I work with gyms like yours on operational tooling - specifically booking dashboards that handle the coordination automatically so you're not juggling messages during class hours.
-
-Happy to share an example of how a similar business cut their admin time in half.
-
-Worth a quick chat?
-
-Personalization Notes:
-  • WhatsApp booking system
-  • Manual class scheduling
-  • No member portal mentioned on site
-```
-
 ---
 
 ## Commands
 
 | Command | Description |
 |---------|-------------|
-| `@heulaulab/intai analyze <url>` | Analyze a business website for operational inefficiencies |
-| `@heulaulab/intai outreach <url>` | Generate a personalized outreach message |
-| `@heulaulab/intai config set api-key <key>` | Set your OpenAI API key |
-| `@heulaulab/intai config get` | View current configuration |
-| `@heulaulab/intai config unset api-key` | Remove stored API key |
-| `@heulaulab/intai --help` | Show help |
-| `@heulaulab/intai --version` | Show version |
+| `intai analyze <url>` | Analyze a business website for operational inefficiencies |
+| `intai outreach <url>` | Generate a personalized outreach message |
+| `intai config set api-key <key>` | Set your OpenAI API key |
+| `intai config get` | View current configuration |
+| `intai --help` | Show help |
+| `intai --version` | Show version |
 
 ### Options
 
@@ -240,27 +179,28 @@ Personalization Notes:
 intai/
 ├── src/
 │   ├── index.ts           # Entry point, CLI setup
-│   ├── commands/         # CLI commands
+│   ├── commands/          # CLI commands
 │   │   ├── analyze.ts
-│   │   └── outreach.ts
+│   │   ├── outreach.ts
+│   │   └── config.ts
 │   ├── analyzers/        # Business logic
 │   │   ├── analysis.ts
 │   │   └── outreach.ts
-│   ├── services/        # External integrations
+│   ├── services/         # External integrations
 │   │   ├── ai.ts
 │   │   └── scraper.ts
-│   ├── prompts/         # AI prompts
+│   ├── prompts/          # AI prompts
 │   │   ├── analysis.ts
 │   │   └── outreach.ts
-│   ├── types/           # TypeScript types
+│   ├── types/            # TypeScript types
 │   │   └── index.ts
-│   └── utils/           # Utilities
+│   └── utils/            # Utilities
 │       ├── env.ts
-│       └── url.ts
-├── dist/                # Compiled output
+│       ├── url.ts
+│       └── spinner.ts
+├── dist/                 # Compiled output
 ├── package.json
 ├── tsconfig.json
-├── .env.example
 └── README.md
 ```
 
@@ -272,21 +212,29 @@ intai/
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `OPENAI_API_KEY` | Yes | Your OpenAI API key |
+| `OPENAI_API_KEY` | Yes* | Your OpenAI API key |
+
+*Or use `intai config set api-key`
 
 ---
 
 ## Development
 
 ```bash
-# Build TypeScript
-npm run build
+# Clone and setup
+git clone https://github.com/heulaulab-dev/intai.git
+cd intai
+npm install
 
-# Watch mode
-npm run dev
+# Build
+npm run build
 
 # Link for local testing
 npm link
+intai <command>
+
+# Watch mode
+npm run dev
 ```
 
 ---
@@ -294,14 +242,16 @@ npm link
 ## Tech Stack
 
 - **Runtime**: Node.js 18+
-- **Language**: TypeScript
+- **Language**: TypeScript 5.6
 - **CLI**: Commander.js
 - **Scraping**: Playwright
 - **AI**: OpenAI SDK
-- **Output**: Chalk, Ora
+- **Output**: Chalk, Boxen, Ora
 
 ---
 
 ## License
 
 MIT
+
+**Repository**: https://github.com/heulaulab-dev/intai
