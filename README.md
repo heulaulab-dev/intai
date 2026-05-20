@@ -1,5 +1,7 @@
 # intai
 
+[![INTAI](/public/intai-header.jpg)](https://github.com/darkroomengineering/satus)
+
 <!-- Badges -->
 [![npm version](https://img.shields.io/npm/v/@heulaulab/intai?style=flat-square)](https://www.npmjs.com/package/@heulaulab/intai)
 [![npm downloads](https://img.shields.io/npm/dm/@heulaulab/intai?style=flat-square)](https://www.npmjs.com/package/@heulaulab/intai)
@@ -257,6 +259,4 @@ npx playwright install chromium
 
 ## License
 
-MIT
-
-**Repository**: https://github.com/heulaulab-dev/intai
+MIT — Built by [heulaulab](https://heulaulab.tazkiyaworks.fun)
