@@ -1,5 +1,3 @@
-# intai
-
 [![INTAI](/public/intai-header.jpg)](https://github.com/darkroomengineering/satus)
 
 <!-- Badges -->
