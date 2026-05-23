@@ -1,4 +1,4 @@
-[![INTAI](/public/intai-header.jpg)](https://github.com/darkroomengineering/satus)
+[![INTAI](/public/intai-header.jpg)](https://github.com/heulaulab-dev/intai)
 
 <!-- Badges -->
 [![npm version](https://img.shields.io/npm/v/@heulaulab/intai?style=flat-square)](https://www.npmjs.com/package/@heulaulab/intai)
